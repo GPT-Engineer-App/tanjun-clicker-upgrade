@@ -2,17 +2,18 @@ let points = 0;
 let premiumCurrency = 0;
 let upgradeCost = 10;
 let ascensionCost = 100;
+let ascensionPoints = 0;
 let characters = {
-    tanjuwun: { level: 1 },
-    eric: { level: 1 },
-    arion: { level: 1 },
-    flo: { level: 1 },
-    wumpus: { level: 1 },
-    claude: { level: 1 }
+    tanjuwun: { level: 1, ability: "Double Points", abilityActive: false },
+    eric: { level: 1, ability: "Auto Click", abilityActive: false },
+    arion: { level: 1, ability: "Triple Points", abilityActive: false },
+    flo: { level: 1, ability: "Double Premium Currency", abilityActive: false },
+    wumpus: { level: 1, ability: "Reduce Upgrade Cost", abilityActive: false },
+    claude: { level: 1, ability: "Increase Points Gain", abilityActive: false }
 };
 
 document.getElementById('clicker-btn').addEventListener('click', () => {
-    points++;
+    points += calculatePoints();
     updateUI();
 });
 
@@ -20,6 +21,7 @@ document.getElementById('upgrade-btn').addEventListener('click', () => {
     if (points >= upgradeCost) {
         points -= upgradeCost;
         upgradeCost *= 2;
+        upgradeCharacters();
         updateUI();
     }
 });
@@ -27,7 +29,9 @@ document.getElementById('upgrade-btn').addEventListener('click', () => {
 document.getElementById('ascend-btn').addEventListener('click', () => {
     if (points >= ascensionCost) {
         points -= ascensionCost;
+        ascensionPoints++;
         ascensionCost *= 2;
+        ascendCharacters();
         updateUI();
     }
 });
@@ -36,6 +40,27 @@ document.getElementById('premium-currency-btn').addEventListener('click', () => 
     premiumCurrency++;
     updateUI();
 });
+
+function calculatePoints() {
+    let totalPoints = 1;
+    if (characters.tanjuwun.abilityActive) totalPoints *= 2;
+    if (characters.arion.abilityActive) totalPoints *= 3;
+    if (characters.claude.abilityActive) totalPoints += 5;
+    return totalPoints;
+}
+
+function upgradeCharacters() {
+    for (let char in characters) {
+        characters[char].level++;
+    }
+}
+
+function ascendCharacters() {
+    for (let char in characters) {
+        characters[char].level = 1;
+    }
+    // Apply permanent boosts or ascension upgrades here
+}
 
 function updateUI() {
     document.getElementById('points').innerText = `Points: ${points}`;
@@ -49,31 +74,3 @@ function updateUI() {
     document.getElementById('wumpus-level').innerText = `Level ${characters.wumpus.level}`;
     document.getElementById('claude-level').innerText = `Level ${characters.claude.level}`;
 }
-
-// Discord SDK Integration
-import { DiscordSDK } from '@discord/embedded-app-sdk';
-const discordSdk = new DiscordSDK('YOUR_OAUTH2_CLIENT_ID');
-
-async function setup() {
-    await discordSdk.ready();
-    const { code } = await discordSdk.commands.authorize({
-        client_id: 'YOUR_OAUTH2_CLIENT_ID',
-        response_type: 'code',
-        state: '',
-        prompt: 'none',
-        scope: ['identify', 'applications.commands'],
-    });
-
-    const response = await fetch('/api/token', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ code }),
-    });
-    const { access_token } = await response.json();
-
-    await discordSdk.commands.authenticate({ access_token });
-}
-
-setup();
