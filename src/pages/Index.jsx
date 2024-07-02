@@ -1,30 +1,20 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 const Index = () => {
-  useEffect(() => {
-    // Initialize the Discord SDK
-    if (window.Discord) {
-      const clientId = 'YOUR_DISCORD_CLIENT_ID';
-      const scopes = ['identify', 'rpc', 'messages.read'];
-      const rpc = new window.Discord.Client({ transport: 'websocket' });
-
-      rpc.on('ready', () => {
-        console.log('Discord SDK initialized successfully');
-      });
-
-      rpc.login({ clientId, scopes }).catch((error) => {
-        console.error('Failed to initialize Discord SDK', error);
-      });
-    } else {
-      console.error('Discord SDK script not loaded');
-    }
-  }, []);
-
   return (
-    <div className="text-center">
-      <h1 className="text-3xl">Welcome to IdleTanjun</h1>
-      <p>Help Tanjun find Alex by progressing through levels and defeating bosses.</p>
-      <a href="/public/index.html" className="text-blue-500">Start Playing</a>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <h1 className="text-4xl font-bold mb-8">Welcome to IdleTanjun</h1>
+      <p className="text-lg mb-8">Help Tanjun find Alex by progressing through levels and defeating bosses.</p>
+      <div className="space-x-4">
+        <Link to="/game">
+          <Button variant="primary">Start Playing</Button>
+        </Link>
+        <Link to="/settings">
+          <Button variant="secondary">Settings</Button>
+        </Link>
+      </div>
     </div>
   );
 };
